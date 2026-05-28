@@ -1,20 +1,36 @@
 const { Kafka } = require('kafkajs');
 
 const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
-const kafka = new Kafka({ clientId: 'tadka-admin', brokers: [BROKER] });
+const kafka = new Kafka({
+  clientId: 'tadka-admin',
+  brokers: [BROKER],
+  logLevel: 1, // WARN — suppress INFO/DEBUG noise
+});
 const admin = kafka.admin();
+
+const TOPICS = [
+  { topic: 'order-events', numPartitions: 3, replicationFactor: 1 },
+  { topic: 'delivery-guarantee-demo', numPartitions: 1, replicationFactor: 1 },
+];
 
 async function setup() {
   await admin.connect();
 
-  await admin.createTopics({
-    topics: [
-      { topic: 'order-events', numPartitions: 3, replicationFactor: 1 },
-      { topic: 'delivery-guarantee-demo', numPartitions: 1, replicationFactor: 1 }
-    ]
-  });
-  console.log('✅ Topic created: order-events (3 partitions)');
-  console.log('✅ Topic created: delivery-guarantee-demo (1 partition)');
+  const existing = new Set(await admin.listTopics());
+
+  const toCreate = TOPICS.filter(t => !existing.has(t.topic));
+  const alreadyExist = TOPICS.filter(t => existing.has(t.topic));
+
+  alreadyExist.forEach(t =>
+    console.log(`ℹ️  Topic already exists: ${t.topic}`)
+  );
+
+  if (toCreate.length > 0) {
+    await admin.createTopics({ topics: toCreate });
+    toCreate.forEach(t =>
+      console.log(`✅ Topic created: ${t.topic} (${t.numPartitions} partition${t.numPartitions > 1 ? 's' : ''})`)
+    );
+  }
 
   await admin.disconnect();
 }

@@ -19,23 +19,32 @@ async function start() {
   console.log('═══════════════════════════════════════════════════════════\n');
 
   const assignedPartitions = [];
+  let idleTimer = null;
 
   consumer.on(consumer.events.GROUP_JOIN, ({ payload }) => {
-    const members = payload.memberAssignment;
-    // Clear previous
+    // Clear any pending idle warning — a new GROUP_JOIN means rebalance is still happening
+    if (idleTimer) { clearTimeout(idleTimer); idleTimer = null; }
+
+    const members = payload.memberAssignment || {};
     assignedPartitions.length = 0;
 
-    if (members && members['order-events']) {
+    if (members['order-events']) {
       assignedPartitions.push(...members['order-events']);
     }
 
-    if (assignedPartitions.length === 0) {
-      console.log(`  ⚠️  Instance #${instanceId}: NO partitions assigned — IDLE consumer!`);
-      console.log('     Golden rule: max consumers = number of partitions (3)');
-      console.log('     This instance is wasting resources.\n');
-    } else {
+    if (assignedPartitions.length > 0) {
       console.log(`  ✅ Instance #${instanceId}: Assigned partitions → [${assignedPartitions.join(', ')}]`);
       console.log(`     Processing ${assignedPartitions.length} of 3 partitions\n`);
+    } else {
+      // Empty on first join = rebalance still in flight; wait for the next GROUP_JOIN.
+      // Only show IDLE warning if still unassigned after 3 seconds.
+      idleTimer = setTimeout(() => {
+        if (assignedPartitions.length === 0) {
+          console.log(`  ⚠️  Instance #${instanceId}: NO partitions assigned — IDLE consumer!`);
+          console.log('     Golden rule: max consumers = number of partitions (3)');
+          console.log('     This instance is wasting resources.\n');
+        }
+      }, 3000);
     }
   });
 
