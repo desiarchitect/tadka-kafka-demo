@@ -1,7 +1,7 @@
 {
   "name": "tadka-kafka-demo",
   "version": "1.0.0",
-  "description": "Tadka App — Kafka Demo for Paper to Production Episode 3",
+  "description": "Tadka App - Kafka Demo for Paper to Production Episode 3",
   "scripts": {
     "setup": "node admin.js",
     "producer": "node producer.js",
@@ -10,6 +10,7 @@
     "restaurant": "node restaurant.js",
     "search-indexer": "node search-indexer.js",
     "partition-demo": "node partition-demo.js",
+    "scaling-demo": "node scaling-demo.js",
     "hot-partition": "node hot-partition-demo.js",
     "at-most-once": "node at-most-once.js",
     "at-least-once": "node at-least-once.js",

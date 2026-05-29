@@ -1,5 +1,5 @@
 #!/bin/bash
-# Tadka Kafka Demo Runner — Linux/Mac
+# Tadka Kafka Demo Runner - Linux/Mac
 # Usage: chmod +x run-demo.sh && ./run-demo.sh
 
 set -e
@@ -15,7 +15,7 @@ NC='\033[0m'
 print_header() {
     echo ""
     echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
-    echo -e "${CYAN}  🍛 Tadka Kafka Demo — The Desi Architect${NC}"
+    echo -e "${CYAN}  🍛 Tadka Kafka Demo - The Desi Architect${NC}"
     echo -e "${CYAN}═══════════════════════════════════════════════════════════${NC}"
     echo ""
 }
@@ -44,14 +44,14 @@ show_menu() {
     echo ""
     echo -e "${WHITE}  Pick a demo:${NC}"
     echo ""
-    echo -e "  1) Setup — Create topics"
-    echo -e "  2) Producer — Send orders"
-    echo -e "  3) Consumers — Run all 4 consumers"
-    echo -e "  4) Partition Demo — Key routing & ordering"
-    echo -e "  5) Scaling Demo — Consumer golden rule"
-    echo -e "  6) Hot Partition — Skew + compound key fix"
-    echo -e "  7) Delivery Guarantees — At-most/least/idempotent"
-    echo -e "  8) Offset Reset — Replay from beginning"
+    echo -e "  1) Setup - Create topics"
+    echo -e "  2) Producer - Send orders"
+    echo -e "  3) Consumers - Run all 4 consumers"
+    echo -e "  4) Partition Demo - Key routing & ordering"
+    echo -e "  5) Scaling Demo - Consumer golden rule"
+    echo -e "  6) Hot Partition - Skew + compound key fix"
+    echo -e "  7) Delivery Guarantees - At-most/least/idempotent"
+    echo -e "  8) Offset Reset - Replay from beginning"
     echo -e "  9) Open Kafka UI"
     echo -e "  0) Stop & cleanup"
     echo ""

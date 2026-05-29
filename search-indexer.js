@@ -1,6 +1,6 @@
 const { Kafka } = require('kafkajs');
 
-// Production mein: Elasticsearch popularity score update karega
+// In production: this will update Elasticsearch popularity scores
 const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
 const kafka = new Kafka({ clientId: 'tadka-search', brokers: [BROKER] });
 const consumer = kafka.consumer({ groupId: 'search-indexer' });
@@ -8,7 +8,7 @@ const consumer = kafka.consumer({ groupId: 'search-indexer' });
 async function start() {
   await consumer.connect();
   await consumer.subscribe({ topic: 'order-events', fromBeginning: true });
-  console.log('🔍 Search Indexer started — boosting Elasticsearch scores...\n');
+  console.log('🔍 Search Indexer started, boosting Elasticsearch scores...\n');
 
   await consumer.run({
     eachMessage: async ({ message }) => {

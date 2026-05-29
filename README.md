@@ -137,27 +137,27 @@ npm run setup
 
 This is the core demo. A producer sends food orders, and 4 independent consumers process them.
 
-**Terminal 1 — Start the producer (sends 1 random order/second):**
+**Terminal 1 - Start the producer (sends 1 random order/second):**
 ```bash
 npm run producer
 ```
 
-**Terminal 2 — Notification service (sends SMS):**
+**Terminal 2 - Notification service (sends SMS):**
 ```bash
 npm run notification
 ```
 
-**Terminal 3 — Analytics service (tracks city-wise revenue):**
+**Terminal 3 - Analytics service (tracks city-wise revenue):**
 ```bash
 npm run analytics
 ```
 
-**Terminal 4 — Restaurant service (alerts restaurants):**
+**Terminal 4 - Restaurant service (alerts restaurants):**
 ```bash
 npm run restaurant
 ```
 
-**Terminal 5 — Search indexer (boosts Elasticsearch scores):**
+**Terminal 5 - Search indexer (boosts Elasticsearch scores):**
 ```bash
 npm run search-indexer
 ```
@@ -357,10 +357,10 @@ docker compose down -v
 ├── admin.js                    # Demo 1: Topic creation
 ├── producer.js                 # Demo 2: Tadka order producer (1 order/sec)
 │
-├── notification.js             # Demo 2: Consumer — SMS notifications
-├── analytics.js                # Demo 2: Consumer — City revenue tracking
-├── restaurant.js               # Demo 2: Consumer — Restaurant alerts
-├── search-indexer.js           # Demo 2: Consumer — Elasticsearch boost
+├── notification.js             # Demo 2: Consumer - SMS notifications
+├── analytics.js                # Demo 2: Consumer - City revenue tracking
+├── restaurant.js               # Demo 2: Consumer - Restaurant alerts
+├── search-indexer.js           # Demo 2: Consumer - Elasticsearch boost
 │
 ├── partition-demo.js           # Demo 4: Partition key routing & ordering
 ├── scaling-demo.js             # Demo 5: Consumer scaling (golden rule)

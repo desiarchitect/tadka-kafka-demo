@@ -7,7 +7,7 @@ const consumer = kafka.consumer({ groupId: 'notification-service' });
 async function start() {
   await consumer.connect();
   await consumer.subscribe({ topic: 'order-events', fromBeginning: true });
-  console.log('📱 Notification Service started — waiting for orders...\n');
+  console.log('📱 Notification Service started, waiting for orders...\n');
 
   await consumer.run({
     eachMessage: async ({ partition, message }) => {

@@ -70,7 +70,7 @@ async function run() {
   }
 
   console.log('\n  💡 Key insight: Ordering is ONLY guaranteed within a partition.');
-  console.log('     Across partitions — no ordering guarantee.\n');
+  console.log('     Across partitions, no ordering guarantee.\n');
 
   await producer.disconnect();
   await admin.disconnect();

@@ -4,7 +4,7 @@ const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
 const kafka = new Kafka({
   clientId: 'tadka-admin',
   brokers: [BROKER],
-  logLevel: 1, // WARN — suppress INFO/DEBUG noise
+  logLevel: 1, // WARN - suppress INFO/DEBUG noise
 });
 const admin = kafka.admin();
 

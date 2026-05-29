@@ -20,7 +20,7 @@ async function run() {
   console.log('  Topic: order-events (3 partitions)');
   console.log('═══════════════════════════════════════════════════════════\n');
 
-  // Part 1: Skewed distribution — 70% Mumbai
+  // Part 1: Skewed distribution, 70% Mumbai
   console.log('── Part 1: Skewed key distribution (70% Mumbai) ──\n');
 
   const skewedCities = [];
