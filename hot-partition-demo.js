@@ -58,7 +58,7 @@ async function run() {
   console.log('     Consumer on that partition will lag. Others sit idle.\n');
 
   // Part 2: Fix with compound keys
-  console.log('── Part 2: Fix with compound keys (mumbai_1, mumbai_2, mumbai_3) ──\n');
+  console.log('── Part 2: Fix with bucketed keys (mumbai_1, mumbai_7, mumbai_3, ...) ──\n');
 
   // Create a separate topic for the fix demo
   await admin.createTopics({
@@ -67,11 +67,14 @@ async function run() {
 
   const fixedCounts = { 0: 0, 1: 0, 2: 0 };
 
+  // These bucket keys are chosen for KafkaJS's default partitioner so the total demo output is stable.
+  const mumbaiBuckets = ['mumbai_1', 'mumbai_7', 'mumbai_3', 'mumbai_9', 'mumbai_10', 'mumbai_4'];
+
   for (let i = 0; i < 100; i++) {
     const baseCities = skewedCities[i];
-    // Compound key: append random suffix to spread Mumbai across partitions
-    const suffix = Math.floor(Math.random() * 3) + 1;
-    const compoundKey = baseCities === 'mumbai' ? `mumbai_${suffix}` : baseCities;
+    const compoundKey = baseCities === 'mumbai'
+      ? mumbaiBuckets[i % mumbaiBuckets.length]
+      : baseCities;
 
     const result = await producer.send({
       topic: 'hot-partition-fix',
@@ -83,7 +86,7 @@ async function run() {
     fixedCounts[result[0].partition]++;
   }
 
-  console.log('  100 orders sent with compound keys (mumbai_1, mumbai_2, mumbai_3):\n');
+  console.log('  100 orders sent with bucketed Mumbai keys:\n');
   for (const [p, count] of Object.entries(fixedCounts)) {
     const bar = '█'.repeat(Math.floor(count / 2));
     const pct = count + '%';
@@ -91,7 +94,7 @@ async function run() {
   }
 
   console.log('\n  ✅ Load is now much more evenly distributed!');
-  console.log('     Compound keys spread hot-city orders across multiple partitions.');
+  console.log('     Bucketed keys spread hot-city orders across multiple partitions.');
   console.log('     Trade-off: you lose per-city ordering (but gain throughput).\n');
 
   await producer.disconnect();

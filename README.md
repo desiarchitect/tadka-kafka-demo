@@ -123,13 +123,13 @@ This starts Kafka, installs dependencies, and gives you a menu to pick any demo.
 
 ### Demo 1: Topic & Partition Setup
 
-Creates two topics: `order-events` (3 partitions) and `delivery-guarantee-demo` (1 partition).
+Creates four topics: `order-events` (3 partitions), plus one isolated topic for each delivery guarantee demo.
 
 ```bash
 npm run setup
 ```
 
-**What to check:** Open http://localhost:8080 → Topics. You'll see both topics with their partition count and replication factor.
+**What to check:** Open http://localhost:8080 → Topics. You'll see all demo topics with their partition count and replication factor.
 
 ---
 
@@ -241,7 +241,7 @@ npm run hot-partition
 
 **What you'll see:**
 - Part 1: A bar chart showing skewed load (one partition at ~70%)
-- Part 2: The fix using compound keys (`mumbai_1`, `mumbai_2`, `mumbai_3`) spreads the load evenly
+- Part 2: The fix using bucketed Mumbai keys spreads the load evenly
 
 **Key takeaway:** Compound keys trade per-city ordering for better throughput.
 
@@ -269,7 +269,7 @@ npm run idempotent
 ```
 Uses `orderId` as a dedup key (in-memory Set for this demo). Skips duplicate messages. In production, you'd use Redis or a database unique constraint for this.
 
-> **Note:** Run these demos one at a time. Each creates its own consumer group, so they won't interfere with each other.
+> **Note:** These demos use separate topics so old messages from one guarantee demo don't pollute the next demo.
 
 ---
 

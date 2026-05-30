@@ -33,7 +33,7 @@ Notification Analytics Restaurant Search Indexer
 - **Purpose**: Creates Kafka topics and partitions before running demos
 - **Concept**: Topic administration
 - **Run**: `npm run setup`
-- **Output**: Confirms topics created (order-events with 3 partitions, delivery-guarantee-demo with 1 partition)
+- **Output**: Confirms topics created (`order-events` with 3 partitions, plus isolated delivery guarantee demo topics)
 - **Production**: DevOps runs this once during infrastructure setup
 
 #### `docker-compose.yml` — Local Kafka Cluster
@@ -120,14 +120,14 @@ These 5 files demonstrate event-driven decoupled architecture.
   Partition 1: 15 messages
   Partition 2: 15 messages
   ```
-- **Part 2**: Uses compound key `mumbai:rest_23` instead of just city
+- **Part 2**: Uses bucketed Mumbai keys instead of just city
   ```
   Partition 0: 34 messages (BALANCED ✅)
   Partition 1: 33 messages
   Partition 2: 33 messages
   ```
 - **Solution**: Change key strategy based on distribution skew
-- **Real-world**: Celebrity restaurant overload? Use restaurant + city combination key
+- **Real-world**: Celebrity restaurant overload? Use a key that spreads load while preserving the ordering your business actually needs
 
 ---
 
@@ -205,7 +205,7 @@ These demonstrate tradeoffs between message loss and duplication.
 - **Concept**: Offset management, log immutability, replay capability
 - **Run**: `npm run offset-reset`
 - **Flow**:
-  - Phase 1: Consume 10 messages normally (offset moves to 10)
+  - Phase 1: Consume 10 messages normally (committed offsets move forward per partition)
   - Phase 2: Reset offset back to 0
   - Phase 3: Replay same 10 messages from beginning
 - **Key Insight**: Kafka doesn't delete data; it just remembers where you are

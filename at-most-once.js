@@ -8,11 +8,12 @@ const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
 const kafka = new Kafka({ clientId: 'tadka-at-most-once', brokers: [BROKER] });
 const consumer = kafka.consumer({ groupId: 'at-most-once-group' });
 const producer = kafka.producer();
+const TOPIC = 'delivery-at-most-once-demo';
 
 async function start() {
   await producer.connect();
   await consumer.connect();
-  await consumer.subscribe({ topic: 'delivery-guarantee-demo', fromBeginning: true });
+  await consumer.subscribe({ topic: TOPIC, fromBeginning: true });
 
   console.log('═══════════════════════════════════════════════════════════');
   console.log('  DEMO 7a: At-Most-Once Delivery');
@@ -23,7 +24,7 @@ async function start() {
   console.log('  Seeding 5 test messages...\n');
   for (let i = 1; i <= 5; i++) {
     await producer.send({
-      topic: 'delivery-guarantee-demo',
+      topic: TOPIC,
       messages: [{ value: JSON.stringify({ orderId: i, item: `Butter Chicken x${i}`, amount: i * 200 }) }]
     });
   }

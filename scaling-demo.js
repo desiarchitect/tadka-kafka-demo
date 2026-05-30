@@ -6,42 +6,58 @@ const { Kafka } = require('kafkajs');
 
 const instanceId = process.argv[2] || '1';
 const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
+const topic = 'order-events';
+const groupId = 'scaling-demo-group';
 const kafka = new Kafka({ clientId: `tadka-scaler-${instanceId}`, brokers: [BROKER] });
-const consumer = kafka.consumer({ groupId: 'scaling-demo-group' });
+const consumer = kafka.consumer({ groupId });
+
+async function getTopicPartitionCount(topicName) {
+  const admin = kafka.admin();
+  await admin.connect();
+  const metadata = await admin.fetchTopicMetadata({ topics: [topicName] });
+  await admin.disconnect();
+
+  const topicMeta = metadata.topics.find(t => t.name === topicName);
+  if (!topicMeta) {
+    throw new Error(`Topic ${topicName} does not exist`);
+  }
+
+  return topicMeta.partitions.length;
+}
 
 async function start() {
+  const partitionCount = await getTopicPartitionCount(topic);
+
   await consumer.connect();
-  await consumer.subscribe({ topic: 'order-events', fromBeginning: false });
+  await consumer.subscribe({ topic, fromBeginning: false });
 
   console.log('═══════════════════════════════════════════════════════════');
   console.log(`  DEMO 5: Consumer Scaling - Instance #${instanceId}`);
-  console.log('  Group: scaling-demo-group | Topic: order-events (3 partitions)');
+  console.log(`  Group: ${groupId} | Topic: ${topic} (${partitionCount} partition${partitionCount > 1 ? 's' : ''})`);
   console.log('═══════════════════════════════════════════════════════════\n');
 
   const assignedPartitions = [];
   let idleTimer = null;
 
   consumer.on(consumer.events.GROUP_JOIN, ({ payload }) => {
-    // Clear any pending idle warning, a new GROUP_JOIN means rebalance is still happening
+    // Clear any pending idle warning; a new GROUP_JOIN means rebalance is still happening.
     if (idleTimer) { clearTimeout(idleTimer); idleTimer = null; }
 
     const members = payload.memberAssignment || {};
     assignedPartitions.length = 0;
 
-    if (members['order-events']) {
-      assignedPartitions.push(...members['order-events']);
+    if (Array.isArray(members[topic])) {
+      assignedPartitions.push(...members[topic]);
     }
 
     if (assignedPartitions.length > 0) {
       console.log(`  ✅ Instance #${instanceId}: Assigned partitions → [${assignedPartitions.join(', ')}]`);
-      console.log(`     Processing ${assignedPartitions.length} of 3 partitions\n`);
+      console.log(`     Processing ${assignedPartitions.length} of ${partitionCount} partition${partitionCount > 1 ? 's' : ''}\n`);
     } else {
-      // Empty on first join = rebalance still in flight; wait for the next GROUP_JOIN.
-      // Only show IDLE warning if still unassigned after 3 seconds.
       idleTimer = setTimeout(() => {
         if (assignedPartitions.length === 0) {
           console.log(`  ⚠️  Instance #${instanceId}: NO partitions assigned, IDLE consumer!`);
-          console.log('     Golden rule: max consumers = number of partitions (3)');
+          console.log(`     Golden rule: max consumers = number of partitions (${partitionCount})`);
           console.log('     This instance is wasting resources.\n');
         }
       }, 3000);

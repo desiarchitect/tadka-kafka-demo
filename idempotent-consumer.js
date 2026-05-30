@@ -8,6 +8,7 @@ const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
 const kafka = new Kafka({ clientId: 'tadka-idempotent', brokers: [BROKER] });
 const consumer = kafka.consumer({ groupId: 'idempotent-consumer-group' });
 const producer = kafka.producer();
+const TOPIC = 'idempotent-consumer-demo';
 
 // In-memory dedup set (In production use Redis or DB)
 const processedOrders = new Set();
@@ -15,7 +16,7 @@ const processedOrders = new Set();
 async function start() {
   await producer.connect();
   await consumer.connect();
-  await consumer.subscribe({ topic: 'delivery-guarantee-demo', fromBeginning: true });
+  await consumer.subscribe({ topic: TOPIC, fromBeginning: true });
 
   console.log('═══════════════════════════════════════════════════════════');
   console.log('  DEMO 7c: Idempotent Consumer');
@@ -36,7 +37,7 @@ async function start() {
 
   for (const order of orders) {
     await producer.send({
-      topic: 'delivery-guarantee-demo',
+      topic: TOPIC,
       messages: [{ value: JSON.stringify(order) }]
     });
   }

@@ -21,12 +21,14 @@ async function run() {
   // Phase 1: Consume normally (first 10 messages)
   console.log('── Phase 1: Normal consumption (first 10 messages) ──\n');
 
+  const phase1Messages = [];
   let count = 0;
   const phase1Promise = new Promise((resolve) => {
     consumer.run({
       eachMessage: async ({ partition, message }) => {
         count++;
         const o = JSON.parse(message.value.toString());
+        phase1Messages.push({ partition, offset: message.offset, orderId: o.orderId, city: o.city });
         console.log(`  [${count}] Order #${o.orderId} | ${o.city} | P${partition} | Offset ${message.offset}`);
 
         if (count === 10) {
@@ -38,7 +40,9 @@ async function run() {
 
   await phase1Promise;
   console.log('\n  ✅ Processed 10 messages normally.');
-  console.log('     Current offset = 10 (consumer remembers where it stopped)\n');
+  console.log('     Kafka stores committed offsets per partition.');
+  console.log('     Conceptually: the consumer remembers where it stopped.');
+  console.log('     Note: with multiple partitions, message ordering across partitions is not global.\n');
 
   // Phase 2: Reset offset to beginning
   console.log('── Phase 2: Resetting offset to BEGINNING ──\n');
@@ -68,7 +72,7 @@ async function run() {
 
   const consumer2 = kafka.consumer({ groupId: 'offset-reset-demo-group' });
   await consumer2.connect();
-  await consumer2.subscribe({ topic: 'order-events', fromBeginning: true });
+  await consumer2.subscribe({ topic: 'order-events', fromBeginning: false });
 
   let replayCount = 0;
   await consumer2.run({
@@ -80,7 +84,8 @@ async function run() {
       }
       if (replayCount === 10) {
         console.log(`  ... (showing first 10 of replay)\n`);
-        console.log('  ✅ Full replay complete! Same messages, consumed again.');
+        console.log('  ✅ Full replay complete! Messages were replayed from offset 0 on each partition.');
+        console.log('     Note: cross-partition message order can differ from the first run.');
         console.log('     Use case: Bug fix, new analytics pipeline, audit trail.');
         console.log('     This is impossible with RabbitMQ. Message is gone after ACK.\n');
         console.log('  💡 Kafka = replayable log. RabbitMQ = fire-and-forget queue.');
