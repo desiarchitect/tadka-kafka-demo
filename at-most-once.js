@@ -2,7 +2,7 @@ const { Kafka } = require('kafkajs');
 
 // Demo 7a: At-Most-Once Delivery
 // Commit offset BEFORE processing
-// If crash happens during processing — message is lost forever
+// If crash happens during processing, message is lost forever
 
 const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
 const kafka = new Kafka({ clientId: 'tadka-at-most-once', brokers: [BROKER] });
@@ -44,7 +44,7 @@ async function start() {
       // Step 2: Simulate crash on message 3
       if (count === 3) {
         console.log(`  💥 CRASH while processing Order #${o.orderId}!`);
-        console.log('     Offset was already committed — this message is LOST.');
+        console.log('     Offset was already committed. This message is LOST.');
         console.log('     On restart, consumer will pick up from offset 3.\n');
         console.log('  Result: At-most-once = message may be lost, never duplicated.');
         await consumer.disconnect();

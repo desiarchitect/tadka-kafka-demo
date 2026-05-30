@@ -2,14 +2,14 @@ const { Kafka } = require('kafkajs');
 
 // Demo 7c: Idempotent Consumer
 // Process + dedup using orderId before commit
-// Production mein Redis ya DB use karo — yahan in-memory Set for demo
+// In production use Redis or DB, here in-memory Set for demo
 
 const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
 const kafka = new Kafka({ clientId: 'tadka-idempotent', brokers: [BROKER] });
 const consumer = kafka.consumer({ groupId: 'idempotent-consumer-group' });
 const producer = kafka.producer();
 
-// In-memory dedup set (Production mein Redis ya DB use karo)
+// In-memory dedup set (In production use Redis or DB)
 const processedOrders = new Set();
 
 async function start() {

@@ -1,6 +1,6 @@
 const { Kafka } = require('kafkajs');
 
-// Production mein: yeh ClickHouse mein insert karega
+// In production: this will insert into ClickHouse
 const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
 const kafka = new Kafka({ clientId: 'tadka-analytics', brokers: [BROKER] });
 const consumer = kafka.consumer({ groupId: 'analytics-service' });
@@ -9,7 +9,7 @@ const revenue = {};
 async function start() {
   await consumer.connect();
   await consumer.subscribe({ topic: 'order-events', fromBeginning: true });
-  console.log('📊 Analytics Service started — tracking revenue for ClickHouse...\n');
+  console.log('📊 Analytics Service started, tracking revenue for ClickHouse...\n');
 
   await consumer.run({
     eachMessage: async ({ message }) => {

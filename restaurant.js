@@ -7,7 +7,7 @@ const consumer = kafka.consumer({ groupId: 'restaurant-service' });
 async function start() {
   await consumer.connect();
   await consumer.subscribe({ topic: 'order-events', fromBeginning: true });
-  console.log('🍽 Restaurant Service started — alerting restaurants...\n');
+  console.log('🍽 Restaurant Service started, alerting restaurants...\n');
 
   await consumer.run({
     eachMessage: async ({ message }) => {

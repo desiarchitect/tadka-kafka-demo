@@ -1,7 +1,7 @@
 const { Kafka } = require('kafkajs');
 
 // Demo 8: Offset Reset & Replay
-// Shows the power of Kafka's log — replay ALL messages from the beginning
+// Shows the power of Kafka's log. Replay ALL messages from the beginning
 
 const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
 const kafka = new Kafka({ clientId: 'tadka-offset-reset', brokers: [BROKER] });
@@ -82,7 +82,7 @@ async function run() {
         console.log(`  ... (showing first 10 of replay)\n`);
         console.log('  ✅ Full replay complete! Same messages, consumed again.');
         console.log('     Use case: Bug fix, new analytics pipeline, audit trail.');
-        console.log('     This is impossible with RabbitMQ — message is gone after ACK.\n');
+        console.log('     This is impossible with RabbitMQ. Message is gone after ACK.\n');
         console.log('  💡 Kafka = replayable log. RabbitMQ = fire-and-forget queue.');
         await consumer2.disconnect();
         await admin.disconnect();

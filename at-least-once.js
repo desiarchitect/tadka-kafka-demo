@@ -2,7 +2,7 @@ const { Kafka } = require('kafkajs');
 
 // Demo 7b: At-Least-Once Delivery
 // Process FIRST, then commit
-// If crash happens after processing but before commit — message is re-delivered (duplicate)
+// If crash happens after processing but before commit, message is re-delivered (duplicate)
 
 const BROKER = process.env.KAFKA_BROKER || 'localhost:9092';
 const kafka = new Kafka({ clientId: 'tadka-at-least-once', brokers: [BROKER] });
@@ -43,7 +43,7 @@ async function start() {
       // Step 2: Simulate crash BEFORE commit on message 3
       if (count === 3) {
         console.log(`\n  💥 CRASH after processing Order #${o.orderId} but BEFORE commit!`);
-        console.log('     Offset NOT committed — on restart, message 3 will be re-delivered.');
+        console.log('     Offset NOT committed. On restart, message 3 will be re-delivered.');
         console.log('     You get a DUPLICATE. Customer gets charged twice? 😱\n');
         console.log('  Result: At-least-once = message may be duplicated, never lost.');
         console.log('  Fix: Make your consumer idempotent (see idempotent-consumer.js)');
